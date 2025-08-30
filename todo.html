@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TODO List</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="max-w-4xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Pending Tasks -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg">
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">📝 My TODO List</h2>
+
+      <div class="flex mb-4">
+        <input type="text" id="taskInput" placeholder="Add a new task..."
+          class="flex-grow px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+        <button onclick="addTask()" class="bg-indigo-600 text-white px-4 py-2 rounded-r-lg hover:bg-indigo-700">Add</button>
+      </div>
+
+      <ul id="taskList" class="space-y-2"></ul>
+    </div>
+
+    <!-- Completed Tasks -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg">
+      <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">✅ Tasks Done</h2>
+      <ul id="doneList" class="space-y-2"></ul>
+    </div>
+  </div>
+
+  <script>
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      const taskText = input.value.trim();
+      if (taskText === '') return;
+
+      const li = document.createElement('li');
+      li.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200';
+
+      // Checkbox
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'mr-3 w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500';
+      checkbox.onchange = () => moveToDone(li, span, checkbox);
+
+      const span = document.createElement('span');
+      span.textContent = taskText;
+      span.className = 'flex-grow text-gray-700';
+
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'flex space-x-2';
+
+      // Edit button
+      const editBtn = document.createElement('button');
+      editBtn.className = 'px-3 py-1 text-sm rounded-lg border border-gray-300 hover:bg-gray-100';
+      editBtn.textContent = 'Edit';
+      editBtn.onclick = () => editTask(span, editBtn, deleteBtn);
+
+      // Delete button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'px-3 py-1 text-sm rounded-lg bg-red-500 text-white hover:bg-red-600';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.onclick = () => li.remove();
+
+      actionsDiv.appendChild(editBtn);
+      actionsDiv.appendChild(deleteBtn);
+
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      li.appendChild(actionsDiv);
+      document.getElementById('taskList').appendChild(li);
+
+      input.value = '';
+    }
+
+    function editTask(span, editBtn, deleteBtn) {
+      const currentText = span.textContent;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = currentText;
+      input.className = 'flex-grow px-2 py-1 border border-gray-300 rounded-lg';
+
+      span.replaceWith(input);
+      input.focus();
+
+      // Change buttons to Update + Delete
+      editBtn.textContent = 'Update';
+      editBtn.className = 'px-3 py-1 text-sm rounded-lg bg-green-500 text-white hover:bg-green-600';
+      editBtn.onclick = () => updateTask(input, span, editBtn, deleteBtn);
+    }
+
+    function updateTask(input, span, editBtn, deleteBtn) {
+      if (input.value.trim() !== '') {
+        span.textContent = input.value.trim();
+      }
+      input.replaceWith(span);
+
+      // Change back to Edit + Delete
+      editBtn.textContent = 'Edit';
+      editBtn.className = 'px-3 py-1 text-sm rounded-lg border border-gray-300 hover:bg-gray-100';
+      editBtn.onclick = () => editTask(span, editBtn, deleteBtn);
+    }
+
+    function moveToDone(li, span, checkbox) {
+      if (checkbox.checked) {
+        span.classList.add('line-through', 'text-gray-500');
+
+        // Remove Edit button in done list
+        li.querySelector('div').innerHTML = '';
+
+        // Add delete button only for done tasks
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'px-3 py-1 text-sm rounded-lg bg-red-500 text-white hover:bg-red-600';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => li.remove();
+
+        li.querySelector('div').appendChild(deleteBtn);
+
+        document.getElementById('doneList').appendChild(li);
+      }
+    }
+  </script>
+</body>
+</html>
